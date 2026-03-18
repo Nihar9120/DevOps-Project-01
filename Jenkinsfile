@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'JDK17'
+        maven 'Maven 3.8.4'
+    }
+
     stages {
 
         stage('Clone Code') {
@@ -9,7 +14,7 @@ pipeline {
             }
         }
 
-        stage('Build Maven') {
+        stage('Build') {
             steps {
                 sh 'mvn clean package'
             }
@@ -17,15 +22,15 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t devops-webapp .'
+                sh 'docker build -t my-webapp .'
             }
         }
 
-        stage('Run Container') {
+        stage('Deploy Container') {
             steps {
-                sh 'docker run -d -p 8081:8080 devops-webapp'
+                sh 'docker rm -f my-container || true'
+                sh 'docker run -d -p 8081:8080 --name my-container my-webapp'
             }
         }
-
     }
 }
